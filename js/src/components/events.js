@@ -3,13 +3,6 @@ import {
   store
 } from './state.js';
 import {
-  $
-} from './gui.js';
-import {
-  loadTileset,
-  saveFinal
-} from './io.js';
-import {
   createCamera,
   createControls
 } from './camera.js';
@@ -18,7 +11,7 @@ import {
   createBoundary
 } from './grid.js';
 import {
-  createCanvas,
+  createProject,
   animate
 } from './canvas.js';
 import {
@@ -35,21 +28,6 @@ function withinBoundaries(x, y) {
   return (x >= leftBound && x <= rightBound && y >= bottomBound && y <= topBound);
 }
 
-function updateLayerVisibility() {
-  const activeZ = parseInt($('zIndexSlider').value);
-  $('zIndexValue').innerText = activeZ;
-  store.placedTiles.forEach(tile => {
-    if (tile.zIndex > activeZ) {
-      tile.mesh.visible = false;
-    } else {
-      tile.mesh.visible = true;
-      tile.mesh.material.opacity = (tile.zIndex === activeZ) ? 1 : (tile.zIndex + 1) / (activeZ + 1);
-    }
-  });
-  if (store.previewMesh) {
-    store.previewMesh.position.z = activeZ;
-  }
-}
 export function initEventListeners() {
   document.addEventListener('keydown', function(event) {
     if (event.key === 'r' || event.key === 'R') {
@@ -59,39 +37,8 @@ export function initEventListeners() {
       }
     }
   });
-  $('loadTileset').addEventListener('click', function() {
-    const tileW = parseInt($('tileWidth').value);
-    const tileH = parseInt($('tileHeight').value);
-    const useAutotile = $('autotileCheckbox').checked;
-    loadTileset(tileW, tileH, useAutotile, $('tilesetInput').files);
-  });
-  $('createProject').addEventListener('click', function() {
-    store.currentGridCols = parseInt($('gridCols').value);
-    store.currentGridRows = parseInt($('gridRows').value);
-    store.currentTileW = parseInt($('tileWidth').value);
-    store.currentTileH = parseInt($('tileHeight').value);
-    if (store.renderer) {
-      $('projectCanvas').removeChild(store.renderer.domElement);
-    }
-    store.scene = new THREE.Scene();
-    store.placedTiles = [];
-    if (store.previewMesh) {
-      store.scene.remove(store.previewMesh);
-      store.previewMesh = null;
-    }
-    const width = $('projectCanvas').clientWidth;
-    const height = $('projectCanvas').clientHeight;
-    createCamera(width, height);
-    createControls(store.camera, $('projectCanvas'));
-    createCanvas(width, height);
-    const grid = createGrid(store.currentGridCols, store.currentGridRows, store.currentTileW, store.currentTileH);
-    store.scene.add(grid);
-    const boundary = createBoundary(store.currentGridCols, store.currentGridRows, store.currentTileW, store.currentTileH);
-    store.scene.add(boundary);
-    animate();
-  });
-  $('zIndexSlider').addEventListener('input', updateLayerVisibility);
-  $('projectCanvas').addEventListener('mousemove', function(event) {
+  const projectCanvas = document.getElementById('projectCanvas');
+  projectCanvas.addEventListener('mousemove', function(event) {
     if (!store.selectedTile) {
       if (store.previewMesh) {
         store.scene.remove(store.previewMesh);
@@ -117,7 +64,7 @@ export function initEventListeners() {
       }
       return;
     }
-    const activeZ = parseInt($('zIndexSlider').value);
+    const activeZ = store.zIndex;
     const cellOccupied = store.placedTiles.some(tile => tile.x === snappedX && tile.y === snappedY && tile.zIndex === activeZ);
     if (cellOccupied) {
       if (store.previewMesh) {
@@ -143,13 +90,13 @@ export function initEventListeners() {
     store.previewMesh.position.set(snappedX, snappedY, activeZ);
     store.previewMesh.rotation.z = store.currentRotation;
   });
-  $('projectCanvas').addEventListener('mouseleave', function() {
+  projectCanvas.addEventListener('mouseleave', function() {
     if (store.previewMesh) {
       store.scene.remove(store.previewMesh);
       store.previewMesh = null;
     }
   });
-  $('projectCanvas').addEventListener('click', function(event) {
+  projectCanvas.addEventListener('click', function(event) {
     if (!store.selectedTile) return;
     const rect = store.renderer.domElement.getBoundingClientRect();
     const mouse = new THREE.Vector2();
@@ -163,7 +110,7 @@ export function initEventListeners() {
     const snappedX = Math.floor(intersectPoint.x / store.currentTileW) * store.currentTileW + store.currentTileW / 2;
     const snappedY = Math.floor(intersectPoint.y / store.currentTileH) * store.currentTileH + store.currentTileH / 2;
     if (!withinBoundaries(snappedX, snappedY)) return;
-    const activeZ = parseInt($('zIndexSlider').value);
+    const activeZ = store.zIndex;
     const existingIndex = store.placedTiles.findIndex(tile => tile.x === snappedX && tile.y === snappedY && tile.zIndex === activeZ);
     if (existingIndex !== -1) {
       const removedTile = store.placedTiles[existingIndex];
@@ -200,7 +147,5 @@ export function initEventListeners() {
     if (store.selectedTile.type === "autotile") {
       updateAutotileNeighbors(snappedX, snappedY, activeZ);
     }
-    updateLayerVisibility();
   });
-  $('saveFinal').addEventListener("click", saveFinal);
 }
