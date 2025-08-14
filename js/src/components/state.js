@@ -84,4 +84,11 @@ export let store = {
   set currentRotation(value) {
     currentRotation = value;
   },
+  get zIndex() {
+    return zIndex;
+  },
+  set zIndex(value) {
+    zIndex = value;
+  },
 };
+let zIndex = 0;

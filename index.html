@@ -18,175 +18,29 @@
         color: white
       }
 
-      input,
-      textarea,
-      select {
-        border-radius: 5px;
-        padding: 4px 12px !important;
-        background-color: #030712;
-        border: 1px solid;
-        border-color: #3d444d !important;
-        color: white;
-      }
-
-      select {
-        border-radius: 5px;
-        padding: 4px 12px !important;
-        background-color: #030712;
-        border-color: #3d444d;
-      }
 
       * {
         box-sizing: border-box;
       }
 
-      #gui {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        padding: 10px 20px;
-        z-index: 2;
-        padding-bottom: 20px;
-        background-color: rgba(255, 255, 255, 0.05);
-        /* white with 5% opacity */
-        backdrop-filter: blur(64px);
-        /* approximate value for backdrop-blur-3xl */
-        border: 1px solid #343740;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        transition: all 300ms;
-      }
 
-      #tileSelector {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 10px;
-        max-height: 80vh;
-        overflow-y: auto;
-        z-index: 2;
-        width: 250px;
-        max-width: 250px;
-        background-color: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(64px);
-        border: 1px solid #343740;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        transition: all 300ms;
-      }
 
       #projectCanvas {
         width: 100vw;
         height: 100vh;
       }
 
-      #zIndexControl {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        padding: 10px;
-        z-index: 3;
-        background-color: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(64px);
-        border: 1px solid #343740;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        transition: all 300ms;
-      }
 
-      .tile {
-        border: 1px solid #000;
-        margin: 2px;
-        cursor: pointer;
-        display: inline-block;
-      }
-
-      .selected {
-        border: 2px solid red;
-      }
-
-      h4 {
-        margin-bottom: 5px;
-      }
-
-      .tileGroup {
-        margin-bottom: 10px;
-      }
-
-      button {
-        cursor: pointer;
-        background-color: rgba(28, 185, 49, 0.5);
-        border: 1px solid #1cb93e;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
-        transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
-      }
-
-      button:hover {
-        background-color: rgb(28, 185, 99);
-      }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   </head>
   <body>
-    <div id="gui">
-      <h3>Tile Settings</h3>
-      <div>
-        <h4>Normal Tileset</h4>
-        <input type="file" id="tilesetInput" multiple accept="image/*">
-        <br>
-        <br>
-        <label>Tile Width (px): </label>
-        <input type="number" id="tileWidth" value="32">
-        <br>
-        <br>
-        <label>Tile Height (px): </label>
-        <input type="number" id="tileHeight" value="32">
-        <br>
-        <br>
-        <button id="loadTileset">Load Tileset</button>
-        <br>
-        <br>
-        <label>
-          <input type="checkbox" id="autotileCheckbox"> Use Autotiling </label>
-      </div>
-      <hr>
-      <h3>Project Settings</h3>
-      <label>Grid Columns: </label>
-      <input type="number" id="gridCols" value="10">
-      <br>
-      <br>
-      <label>Grid Rows: </label>
-      <input type="number" id="gridRows" value="10">
-      <br>
-      <br>
-      <button id="createProject">Create Project Canvas</button>
-      <br>
-      <br>
-      <button id="saveFinal">Save Final</button>
-    </div>
-    <div id="tileSelector">
-      <h3>Tiles</h3>
-      <div class="tileGroup">
-        <h4>Normal Tiles</h4>
-        <div id="normalTilesContainer"></div>
-      </div>
-      <div class="tileGroup">
-        <h4>Autotile</h4>
-        <div id="autotileContainer"></div>
-      </div>
-    </div>
     <div id="projectCanvas"></div>
-    <div id="zIndexControl">
-      <label for="zIndexSlider">Z-Index:</label>
-      <input type="range" id="zIndexSlider" min="0" max="10" value="0">
-      <span id="zIndexValue">0</span>
-    </div>
     <script type="importmap"> {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@v0.173.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.173.0/examples/jsm/"
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.173.0/examples/jsm/",
+        "lil-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.19.1/dist/lil-gui.esm.js"
       }
     }
   </script>

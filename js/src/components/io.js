@@ -2,40 +2,27 @@ import {
   store
 } from './state.js';
 import {
-  $
-} from './gui.js';
-import {
-  updateAutotileNeighbors
-} from './tiles.js';
+  updateTileSelector
+} from './tile-selector.js';
 export function loadTileset(tileW, tileH, useAutotile, files) {
   if (!files.length) {
     alert("Please select at least one tileset image.");
     return;
   }
+  store.tiles.length = 0;
+  store.autotile = null;
+  let filesLoaded = 0;
   Array.from(files).forEach(file => {
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = new Image();
       img.onload = function() {
         if (useAutotile) {
-          img.classList.add('tile');
-          img.style.width = tileW + 'px';
-          img.style.height = tileH + 'px';
-          img.addEventListener('click', function() {
-            document.querySelectorAll('.tile').forEach(el => el.classList.remove('selected'));
-            img.classList.add('selected');
-            store.selectedTile = {
-              dataURL: img.src,
-              type: "autotile"
-            };
-          });
-          $('autotileContainer').appendChild(img);
-          store.tiles.push({
+          store.autotile = {
             dataURL: img.src,
             type: "autotile"
-          });
+          };
         } else {
-          // slicer by defined dimension
           const cols = Math.floor(img.width / tileW);
           const rows = Math.floor(img.height / tileH);
           for (let y = 0; y < rows; y++) {
@@ -45,22 +32,16 @@ export function loadTileset(tileW, tileH, useAutotile, files) {
               tileCanvas.height = tileH;
               const ctx = tileCanvas.getContext('2d');
               ctx.drawImage(img, x * tileW, y * tileH, tileW, tileH, 0, 0, tileW, tileH);
-              tileCanvas.classList.add('tile');
-              tileCanvas.addEventListener('click', function() {
-                document.querySelectorAll('.tile').forEach(el => el.classList.remove('selected'));
-                tileCanvas.classList.add('selected');
-                store.selectedTile = {
-                  dataURL: tileCanvas.toDataURL(),
-                  type: "normal"
-                };
-              });
-              $('normalTilesContainer').appendChild(tileCanvas);
               store.tiles.push({
                 dataURL: tileCanvas.toDataURL(),
                 type: "normal"
               });
             }
           }
+        }
+        filesLoaded++;
+        if (filesLoaded === files.length) {
+          updateTileSelector();
         }
       };
       img.src = e.target.result;
